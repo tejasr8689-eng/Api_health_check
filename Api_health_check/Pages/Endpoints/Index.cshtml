@@ -1,0 +1,45 @@
+﻿@page
+@model Api_health_check.Pages.Endpoints.Index
+@{
+    ViewData["Title"] = "Health Dashboard";
+}
+
+<h1>Health Dashboard</h1>
+
+<p>
+    <a asp-page="/Endpoints/Create" class="btn btn-primary">Add Endpoint</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Url</th>
+            <th>Last Status</th>
+            <th>Is Down</th>
+            <th>Last Check (UTC)</th>
+            <th>Failures</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var e in Model.Endpoints)
+        {
+            var rowClass = e.IsDown ? "table-danger" : "table-success";
+            <tr class="@rowClass">
+                <td>@e.Name</td>
+                <td>@e.Url</td>
+                <td>@(e.LastStatusCode?.ToString() ?? "-")</td>
+                <td>@e.IsDown</td>
+                <td>@(e.LastCheckUtc?.ToString("u") ?? "-")</td>
+                <td>@e.ConsecutiveFailures</td>
+                <td>
+                    <a asp-page="/Endpoints/Edit" asp-route-id="@e.Id" class="btn btn-primary btn-sm">Edit</a>
+                </td>
+                <td>
+                    <a asp-page="/Endpoints/Delete" asp-route-id="@e.Id" class="btn btn-primary btn-sm">Delete</a>
+                </td>
+                
+            </tr>
+        }
+    </tbody>
+</table>
