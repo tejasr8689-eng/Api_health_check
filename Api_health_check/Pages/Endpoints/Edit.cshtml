@@ -8,6 +8,8 @@
 <h1>Edit Endpoint</h1>
 
 <form method="post">
+	<input type="hidden" asp-for="Endpoint.Id" />
+
 	<div class="mb-3">
 		<label asp-for="Endpoint.Name" class="form-label"></label>
 		<input asp-for="Endpoint.Name" class="form-control" />
