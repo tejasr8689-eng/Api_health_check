@@ -30,6 +30,16 @@
         <input asp-for="Endpoint.NotifyEmail" class="form-control" />
         <span asp-validation-for="Endpoint.NotifyEmail" class="text-danger"></span>
     </div>
+    <div class="mb-3">
+        <label asp-for="Endpoint.AppPoolName" class="form-label"></label>
+        <input asp-for="Endpoint.AppPoolName" class="form-control" />
+        <span asp-validation-for="Endpoint.AppPoolName" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Endpoint.RecoveryWebhookUrl" class="form-label"></label>
+        <input asp-for="Endpoint.RecoveryWebhookUrl" class="form-control" />
+        <span asp-validation-for="Endpoint.RecoveryWebhookUrl" class="text-danger"></span>
+    </div>
 
     <div class="form-check mb-3">
         <input asp-for="Endpoint.IsActive" class="form-check-input" />

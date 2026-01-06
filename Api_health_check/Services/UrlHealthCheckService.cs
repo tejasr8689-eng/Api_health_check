@@ -18,6 +18,8 @@ namespace Api_health_check.Services
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IEmailSender _emailSender;
+        //private readonly RecoveryOrchestratorService _recoveryOrchestrator;
+
         // keep the main loop tight so we can honor per-endpoint intervals in-memory
         private readonly TimeSpan _loopDelay = TimeSpan.FromSeconds(1);
 
@@ -25,12 +27,15 @@ namespace Api_health_check.Services
             ILogger<UrlHealthCheckService> logger,
             IServiceScopeFactory scopeFactory,
             IHttpClientFactory httpClientFactory,
-            IEmailSender emailSender)
+            IEmailSender emailSender
+           ///* RecoveryOrchestratorService recoveryOrchestrator*/
+           )
         {
             _logger = logger;
             _scopeFactory = scopeFactory;
-            _httpClientFactory = httpClientFactory;
+            _httpClientFactory = httpClientFactory; 
             _emailSender = emailSender;
+            ////_recoveryOrchestrator = recoveryOrchestrator;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -43,6 +48,7 @@ namespace Api_health_check.Services
                 {
                     using var scope = _scopeFactory.CreateScope();
                     var db = scope.ServiceProvider.GetRequiredService<HealthCheckContext>();
+                    var recoveryOrchestrator = scope.ServiceProvider.GetRequiredService<RecoveryOrchestratorService>();
 
                     // load active endpoints and decide in-memory which ones are due
                     var endpoints = await db.MonitoredEndpoints
@@ -123,6 +129,29 @@ namespace Api_health_check.Services
 
                         _logger.LogInformation("Checked endpoint {Name} ({Url}): IsDown={IsDown}, LastStatus={Status}, Failures={Failures}, LastCheck={LastCheck}",
                             endpoint.Name, endpoint.Url, endpoint.IsDown, endpoint.LastStatusCode?.ToString() ?? "-", endpoint.ConsecutiveFailures, endpoint.LastCheckUtc?.ToString("u") ?? "-");
+
+                        // 🔁 AUTO-RECOVERY (after consecutive failures)
+                        if (endpoint.IsDown &&
+                            endpoint.ConsecutiveFailures >= 3 &&
+                            endpoint.NotifyOnRecovery) // reuse flag as enable/disable
+                        {
+                            try
+                            {
+                                _logger.LogWarning(
+                                    "Endpoint {EndpointId} is DOWN for {Failures} checks. Triggering recovery.",
+                                    endpoint.Id,
+                                    endpoint.ConsecutiveFailures);
+
+                                await recoveryOrchestrator.RecoverAsync(endpoint);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError(
+                                    ex,
+                                    "Recovery attempt failed for endpoint {EndpointId}",
+                                    endpoint.Id);
+                            }
+                        }
 
                         // DOWN email: only once per outage
                         if (endpoint.IsDown &&

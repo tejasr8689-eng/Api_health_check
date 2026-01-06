@@ -38,6 +38,16 @@
 		<input asp-for="Endpoint.IsActive" class="form-check-input" />
 		<label asp-for="Endpoint.IsActive" class="form-check-label"></label>
 	</div>
+	<div class="mb-3">
+		<label asp-for="Endpoint.AppPoolName" class="form-label"></label>
+		<input asp-for="Endpoint.AppPoolName" class="form-control" />
+		<span asp-validation-for="Endpoint.AppPoolName" class="text-danger"></span>
+	</div>
+	<div class="mb-3">
+		<label asp-for="Endpoint.RecoveryWebhookUrl" class="form-label"></label>
+		<input asp-for="Endpoint.RecoveryWebhookUrl" class="form-control" />
+		<span asp-validation-for="Endpoint.RecoveryWebhookUrl" class="text-danger"></span>
+	</div>
 
 	<button type="submit" class="btn btn-primary">Save</button>
 </form>
