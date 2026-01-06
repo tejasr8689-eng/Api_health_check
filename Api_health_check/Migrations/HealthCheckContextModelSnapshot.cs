@@ -33,6 +33,10 @@ namespace Api_health_check.Migrations
                     b.Property<bool>("AlertSentForCurrentDown")
                         .HasColumnType("bit");
 
+                    b.Property<string>("AppPoolName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("CheckIntervalSeconds")
                         .HasColumnType("int");
 
@@ -62,6 +66,10 @@ namespace Api_health_check.Migrations
                     b.Property<bool>("NotifyOnRecovery")
                         .HasColumnType("bit");
 
+                    b.Property<string>("RecoveryWebhookUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Url")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -69,6 +77,36 @@ namespace Api_health_check.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("MonitoredEndpoints");
+                });
+
+            modelBuilder.Entity("Api_health_check.Models.RecoveryAuditLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("AttemptedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EndpointId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Success")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RecoveryAuditLos");
                 });
 #pragma warning restore 612, 618
         }

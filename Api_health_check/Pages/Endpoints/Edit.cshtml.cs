@@ -17,7 +17,7 @@ namespace Api_health_check.Pages.Endpoints
         }
 
         [BindProperty]
-        public MonitoredEndpoint Endpoint { get; set; } = new MonitoredEndpoint();
+        public MonitoredEndpoint Endpoint { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {

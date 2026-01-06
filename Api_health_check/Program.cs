@@ -13,7 +13,11 @@ builder.Services.AddRazorPages();
 builder.Services.AddDbContext<HealthCheckContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("HealthCheckerDb")));
 builder.Services.AddSingleton<IEmailSender, SmtpEmailSender>();
-
+builder.Services.AddScoped<AuditLogService>();
+builder.Services.AddSingleton<RetryPolicyService>();
+builder.Services.AddSingleton<IisRecoveryService>();
+builder.Services.AddSingleton<WebhookRecoveryService>();
+builder.Services.AddScoped<RecoveryOrchestratorService>();
 
 // HttpClient for background checks
 builder.Services.AddHttpClient();

@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using Api_health_check.Models;
 
 namespace Api_health_check.Data
 {
@@ -21,6 +22,8 @@ namespace Api_health_check.Data
         public bool AlertSentForCurrentDown { get; set; }
         public bool IsActive { get; set; } = true;
         public bool NotifyOnRecovery { get; set; } = true; // optional toggle
+        public required string AppPoolName { get; set; } = string.Empty;
+        public required string RecoveryWebhookUrl { get; set; } = string.Empty;
 
     }
 
@@ -32,5 +35,6 @@ namespace Api_health_check.Data
         }
 
         public DbSet<MonitoredEndpoint> MonitoredEndpoints => Set<MonitoredEndpoint>();
+        public DbSet<RecoveryAuditLog> RecoveryAuditLos { get; set; }
     }
 }

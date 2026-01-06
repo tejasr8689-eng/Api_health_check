@@ -15,10 +15,16 @@ namespace Api_health_check.Pages.Endpoints
         }
 
         [BindProperty]
-        public MonitoredEndpoint Endpoint { get; set; } = new MonitoredEndpoint();
+        public MonitoredEndpoint Endpoint { get; set; } = default!; // do not new() here
 
         public void OnGet()
         {
+            // provide defaults so the Razor form and generated code see non-null values
+            Endpoint = new MonitoredEndpoint
+            {
+                AppPoolName = string.Empty,
+                RecoveryWebhookUrl = string.Empty
+            };
         }
 
         public async Task<IActionResult> OnPostAsync()

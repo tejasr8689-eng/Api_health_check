@@ -46,7 +46,7 @@ namespace Api_health_check.Pages.Endpoints
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToPage("/Index");
+            return RedirectToPage("/Endpoints/Index");
         }
     }
 }
