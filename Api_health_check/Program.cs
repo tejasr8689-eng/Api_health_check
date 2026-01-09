@@ -2,6 +2,8 @@ using Api_health_check.Data;
 using Api_health_check.Services;
 using Api_health_check.Email;
 using Microsoft.EntityFrameworkCore;
+using System;
+using Microsoft.Web.Administration;
 
 
 
@@ -44,5 +46,12 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 
+using (var server = new ServerManager())
+{
+    foreach (var pool in server.ApplicationPools)
+    {
+        Console.WriteLine(pool.Name);
+    }
+}
 
 app.Run();

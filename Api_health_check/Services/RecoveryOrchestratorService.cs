@@ -28,21 +28,14 @@ namespace Api_health_check.Services
 
             if (!string.IsNullOrWhiteSpace(endpoint.AppPoolName))
             {
-                iisResult = await _retry.ExecuteAsync(async () =>
-                {
-                    return await Task.FromResult(
-                        _iis.RestartAppPool(endpoint.AppPoolName));
-                });
+                iisResult = await _retry.ExecuteAsync(() =>
+                    Task.FromResult(_iis.RestartAppPool(endpoint.AppPoolName)));
 
-                await _audit.TaskAsync(
-                    endpoint.Id,
-                    "IIS_RESTART",
-                    iisResult,
-                    iisResult ? "App pool recycled" : "Failed to recycle");
+                var iisMessage = iisResult ? "App pool recycled" : (_iis.LastError ?? "Failed to recycle");
+                await _audit.TaskAsync(endpoint.Id, "IIS_RESTART", iisResult, iisMessage);
+
+                if (iisResult) return;
             }
-
-            if (iisResult)
-                return;
 
             // 2️ Fallback to webhook (only if URL exists)
             bool webhookResult = false;
