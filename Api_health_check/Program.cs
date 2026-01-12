@@ -1,9 +1,9 @@
+using Api_health_check.Clients;
 using Api_health_check.Data;
 using Api_health_check.Services;
 using Api_health_check.Email;
 using Microsoft.EntityFrameworkCore;
 using System;
-using Microsoft.Web.Administration;
 
 
 
@@ -17,9 +17,10 @@ builder.Services.AddDbContext<HealthCheckContext>(options =>
 builder.Services.AddSingleton<IEmailSender, SmtpEmailSender>();
 builder.Services.AddScoped<AuditLogService>();
 builder.Services.AddSingleton<RetryPolicyService>();
-builder.Services.AddSingleton<IisRecoveryService>();
 builder.Services.AddSingleton<WebhookRecoveryService>();
 builder.Services.AddScoped<RecoveryOrchestratorService>();
+builder.Services.AddHttpClient<IRecoveryClient, RecoveryClient>();
+
 
 // HttpClient for background checks
 builder.Services.AddHttpClient();
@@ -46,12 +47,12 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 
-using (var server = new ServerManager())
-{
-    foreach (var pool in server.ApplicationPools)
-    {
-        Console.WriteLine(pool.Name);
-    }
-}
+//using (var server = new ServerManager())
+//{
+//    foreach (var pool in server.ApplicationPools)
+//    {
+//        Console.WriteLine(pool.Name);
+//    }
+//}
 
 app.Run();

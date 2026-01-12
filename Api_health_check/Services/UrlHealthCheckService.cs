@@ -1,14 +1,15 @@
-﻿using System;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using Api_health_check.Clients;
 using Api_health_check.Data;
 using Api_health_check.Email;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Api_health_check.Services
 {
@@ -18,6 +19,7 @@ namespace Api_health_check.Services
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IEmailSender _emailSender;
+      
         //private readonly RecoveryOrchestratorService _recoveryOrchestrator;
 
         // keep the main loop tight so we can honor per-endpoint intervals in-memory
@@ -28,6 +30,7 @@ namespace Api_health_check.Services
             IServiceScopeFactory scopeFactory,
             IHttpClientFactory httpClientFactory,
             IEmailSender emailSender
+           
            ///* RecoveryOrchestratorService recoveryOrchestrator*/
            )
         {
@@ -35,6 +38,7 @@ namespace Api_health_check.Services
             _scopeFactory = scopeFactory;
             _httpClientFactory = httpClientFactory; 
             _emailSender = emailSender;
+            
             ////_recoveryOrchestrator = recoveryOrchestrator;
         }
 
