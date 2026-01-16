@@ -66,6 +66,9 @@ namespace Api_health_check.Migrations
                     b.Property<bool>("NotifyOnRecovery")
                         .HasColumnType("bit");
 
+                    b.Property<int>("RecoveryAction")
+                        .HasColumnType("int");
+
                     b.Property<string>("RecoveryWebhookUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

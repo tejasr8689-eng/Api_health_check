@@ -45,6 +45,18 @@
         <input asp-for="Endpoint.IsActive" class="form-check-input" />
         <label asp-for="Endpoint.IsActive" class="form-check-label"></label>
     </div>
+    <div class="from-group">
+        <label asp-for="Endpoint.RecoveryAction" class="form-label"></label>
+        <select asp-for="Endpoint.RecoveryAction" class="form-select" asp-items="Model.RecoveryAction">
+          @*   <option value="">Restart AppPool</option> *@
+            <@* option value="1">StartWebsite</option>
+            <option value="2">RestartWebsite</option>
+            <option value="3">FullRecovery</option> *@
+
+
+        </select>
+        <span asp-validation-for="Endpoint.RecoveryAction" class="text-danger">Full Recovery Recomended</span>
+    </div> 
 
     <button type="submit" class="btn btn-primary">Save</button>
 </form>

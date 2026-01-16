@@ -48,6 +48,12 @@
 		<input asp-for="Endpoint.RecoveryWebhookUrl" class="form-control" />
 		<span asp-validation-for="Endpoint.RecoveryWebhookUrl" class="text-danger"></span>
 	</div>
+	<div class="from-group">
+		<label asp-for="Endpoint.RecoveryAction" class="form-label"></label>
+		<select asp-for="Endpoint.RecoveryAction" class="form-select" asp-items="Model.RecoveryAction">
+		</select>
+		<span asp-validation-for="Endpoint.RecoveryAction" class="text-danger">Full Recovery Recomended</span>
+	</div>
 
 	<button type="submit" class="btn btn-primary">Save</button>
 </form>
