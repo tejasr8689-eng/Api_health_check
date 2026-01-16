@@ -24,6 +24,7 @@ namespace Api_health_check.Data
         public bool NotifyOnRecovery { get; set; } = true; // optional toggle
         public required string AppPoolName { get; set; } = string.Empty;
         public required string RecoveryWebhookUrl { get; set; } = string.Empty;
+        public required int RecoveryAction { get; set; } = 0; // 1:Recycle, 2:Restart, etc.
 
     }
 

@@ -1,5 +1,8 @@
-﻿using System.Net.Http.Json;
-using Api_health_check.Data;
+﻿using Api_health_check.Data;
+using System;
+using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
 
 namespace Api_health_check.Clients
 {
@@ -14,20 +17,47 @@ namespace Api_health_check.Clients
 
         public async Task<bool> TriggerRecoveryAsync(MonitoredEndpoint endpoint)
         {
-            if (string.IsNullOrWhiteSpace(endpoint.RecoveryWebhookUrl))
-                return false;
+            
+                using var client = new HttpClient();
 
-            var url = endpoint.RecoveryWebhookUrl.TrimEnd('/');
+                client.DefaultRequestHeaders.Add(
+                    "X-Recovery-Key",
+                    "tejasrapikeyforhealthcheckapi@8689973corm"
+                );
 
-            if (!url.EndsWith("/recover"))
-                url += "/recover";
+                var payload = new
+                {
+                    action = endpoint.RecoveryAction,          // 👈 user provided
+                    target = endpoint.AppPoolName      // 👈 user provided
+                };
 
-            var response = await _http.PostAsJsonAsync(url, new
-            {
-                appPoolName = endpoint.AppPoolName
-            });
+                var content = new StringContent(
+                    JsonSerializer.Serialize(payload),
+                    Encoding.UTF8,
+                    "application/json"
+                );
 
-            return response.IsSuccessStatusCode;
+                var response = await client.PostAsync(
+                    "http://localhost:5005/recover",
+                    content
+                );
+
+                return response.IsSuccessStatusCode;
+            
+            //if (string.IsNullOrWhiteSpace(endpoint.RecoveryWebhookUrl))
+            //    return false;
+
+            //var url = endpoint.RecoveryWebhookUrl.TrimEnd('/');
+
+            //if (!url.EndsWith("/recover"))
+            //    url += "/recover";
+
+            //var response = await _http.PostAsJsonAsync(url, new
+            //{
+            //    appPoolName = endpoint.AppPoolName
+            //});
+
+            //return response.IsSuccessStatusCode;
         }
     }
 }
