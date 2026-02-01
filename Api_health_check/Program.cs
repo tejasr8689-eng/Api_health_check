@@ -3,6 +3,8 @@ using Api_health_check.Data;
 using Api_health_check.Services;
 using Api_health_check.Email;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+
 using System;
 
 
@@ -20,7 +22,17 @@ builder.Services.AddSingleton<RetryPolicyService>();
 builder.Services.AddSingleton<WebhookRecoveryService>();
 builder.Services.AddScoped<RecoveryOrchestratorService>();
 builder.Services.AddHttpClient<IRecoveryClient, RecoveryClient>();
-
+builder.Services.AddLogging(logging =>
+{
+    logging.ClearProviders();
+    logging.AddSerilog(new LoggerConfiguration()
+        .WriteTo.Console()
+        .WriteTo.File("D:\\publish\\logs-.txt",
+            rollingInterval: RollingInterval.Day,
+            retainedFileCountLimit: 30,
+            outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+        .CreateLogger());
+});
 
 // HttpClient for background checks
 builder.Services.AddHttpClient();

@@ -1,5 +1,8 @@
 ﻿using Api_health_check.Data;
+using Microsoft.Identity.Client;
+using Microsoft.IdentityModel.Tokens;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -15,6 +18,17 @@ namespace Api_health_check.Clients
             _http = http;
         }
 
+        public static string ShortId (int Length)
+        {
+            return Guid.NewGuid().
+                   ToString("N").Substring(0, Length).ToUpper();
+        }
+        public static string GenerateRequestId()
+        {
+            String shortId =  ShortId(10);
+            return $"RCV-{DateTime.UtcNow:yyyyMMdd-HHmmss}-{Random.Shared.Next(1000, 9999)}";
+        }
+
         public async Task<bool> TriggerRecoveryAsync(MonitoredEndpoint endpoint)
         {
             
@@ -24,11 +38,15 @@ namespace Api_health_check.Clients
                     "X-Recovery-Key",
                     "tejasrapikeyforhealthcheckapi@8689973corm"
                 );
-
+                
+                
+                
                 var payload = new
                 {
+                    requestId = GenerateRequestId(), // 👈 generated
                     action = endpoint.RecoveryAction,          // 👈 user provided
-                    target = endpoint.AppPoolName      // 👈 user provided
+                    target = endpoint.AppPoolName,      // 👈 user provided
+                    webHookUrl= endpoint.RecoveryWebhookUrl 
                 };
 
                 var content = new StringContent(

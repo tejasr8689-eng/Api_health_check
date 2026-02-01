@@ -26,6 +26,9 @@ namespace Api_health_check.Data
         public required string RecoveryWebhookUrl { get; set; } = string.Empty;
         public required int RecoveryAction { get; set; } = 0; // 1:Recycle, 2:Restart, etc.
 
+        public DateTime? LastRecoveryUtc { get; set; }
+        public int RecoveryCoolDownSeconds { get; set; } = 300; // default 30 minutes
+
     }
 
     public class HealthCheckContext : DbContext

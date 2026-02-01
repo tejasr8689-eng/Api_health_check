@@ -1,5 +1,6 @@
 ﻿using Api_health_check.Clients;
 using Api_health_check.Data;
+using Api_health_check.Models;
 using Api_health_check.Email;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics.Eventing.Reader;
 
 namespace Api_health_check.Services
 {
@@ -30,8 +32,7 @@ namespace Api_health_check.Services
             IServiceScopeFactory scopeFactory,
             IHttpClientFactory httpClientFactory,
             IEmailSender emailSender
-           
-           ///* RecoveryOrchestratorService recoveryOrchestrator*/
+            ///* RecoveryOrchestratorService recoveryOrchestrator*/
            )
         {
             _logger = logger;
@@ -42,6 +43,13 @@ namespace Api_health_check.Services
             ////_recoveryOrchestrator = recoveryOrchestrator;
         }
 
+        private bool IsInRecoveryCoolDown(MonitoredEndpoint endpoint)
+        {
+            if (!endpoint.LastCheckUtc.HasValue)
+                return false;
+            var nextAllowedRecovery = endpoint.LastRecoveryUtc.Value.AddSeconds(endpoint.RecoveryCoolDownSeconds);
+            return DateTime.UtcNow < nextAllowedRecovery;   
+        }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("UrlHealthCheckService started at: {time}", DateTimeOffset.Now);
@@ -139,23 +147,56 @@ namespace Api_health_check.Services
                             endpoint.ConsecutiveFailures >= 3 &&
                             endpoint.NotifyOnRecovery) // reuse flag as enable/disable
                         {
-                            try
+                            if (IsInRecoveryCoolDown(endpoint))
+                            {
+                                _logger.LogInformation(
+                                                       "Recovery skipped for endpoint {endpointId} due to cooldown time, LastRecoverAtUtc = {LastRecoveryUtc} ",
+                                                       endpoint.Id,
+                                                       endpoint.LastCheckUtc);
+
+                                db.RecoveryAuditLos.Add(new Models.RecoveryAuditLog
+                                {
+                                    EndpointId = endpoint.Id,
+                                    Action = "COOLDOWN_SKIP",
+                                    Success = true,
+                                    Message = "Recovery skipped due to cooldown period",
+                                    AttemptedAtUtc = DateTime.UtcNow,
+                                    RecoveryWebhookUrl = endpoint.RecoveryWebhookUrl
+                                });
+                                await db.SaveChangesAsync(stoppingToken);
+                            }
+
+                            else
                             {
                                 _logger.LogWarning(
-                                    "Endpoint {EndpointId} is DOWN for {Failures} checks. Triggering recovery.",
+                                    "Endpoint is being triggerd for endpoint {EndpointId} after {Consecutivefailure} consecutive failure",
                                     endpoint.Id,
                                     endpoint.ConsecutiveFailures);
-
                                 await recoveryOrchestrator.RecoverAsync(endpoint);
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger.LogError(
-                                    ex,
-                                    "Recovery attempt failed for endpoint {EndpointId}",
-                                    endpoint.Id);
+                                //update last recovery time
+                                endpoint.LastRecoveryUtc = DateTime.UtcNow;
+                                db.Entry(endpoint).Property(e => e.LastRecoveryUtc).IsModified = true;
+                                await db.SaveChangesAsync(stoppingToken);
                             }
                         }
+
+                            //try
+                            //{
+                            //    _logger.LogWarning(
+                            //        "Endpoint {EndpointId} is DOWN for {Failures} checks. Triggering recovery.",
+                            //        endpoint.Id,
+                            //        endpoint.ConsecutiveFailures);
+
+                            //    await recoveryOrchestrator.RecoverAsync(endpoint);
+                            //}
+                            //catch (Exception ex)
+                            //{
+                            //    _logger.LogError(
+                            //        ex,
+                            //        "Recovery attempt failed for endpoint {EndpointId}",
+                            //        endpoint.Id);
+                            //}
+                        
 
                         // DOWN email: only once per outage
                         if (endpoint.IsDown &&

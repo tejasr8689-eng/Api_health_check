@@ -52,6 +52,9 @@ namespace Api_health_check.Migrations
                     b.Property<DateTime?>("LastCheckUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("LastRecoveryUtc")
+                        .HasColumnType("datetime2");
+
                     b.Property<int?>("LastStatusCode")
                         .HasColumnType("int");
 
@@ -67,6 +70,9 @@ namespace Api_health_check.Migrations
                         .HasColumnType("bit");
 
                     b.Property<int>("RecoveryAction")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RecoveryCoolDownSeconds")
                         .HasColumnType("int");
 
                     b.Property<string>("RecoveryWebhookUrl")
@@ -101,6 +107,10 @@ namespace Api_health_check.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RecoveryWebhookUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
