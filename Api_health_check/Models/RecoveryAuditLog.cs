@@ -8,6 +8,6 @@
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;
         public DateTime AttemptedAtUtc { get; set; }
-
+        public string RecoveryWebhookUrl { get; set; } = string.Empty;
     }
 }
