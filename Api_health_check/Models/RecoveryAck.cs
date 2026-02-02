@@ -2,12 +2,12 @@
 {
     public class RecoveryAck
     {
-        public string RequestId { get; set; } = "";
+        public string requestId { get; set; } = "";
         public string target { get; set; } = "";
-        public string Action { get; set; } = "";
-        public string Status { get; set; }  = "";
-        public string Details { get; set; } = "";
+        public string action { get; set; } = "";
+        public string status { get; set; }  = "";
+        public string details { get; set; } = "";
 
-        public DateTime CompletedAt { get; set; }
+        public DateTime completedAt { get; set; }
     }
 }
