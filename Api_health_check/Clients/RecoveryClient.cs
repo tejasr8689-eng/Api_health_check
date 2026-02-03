@@ -1,4 +1,5 @@
 ﻿using Api_health_check.Data;
+using Api_health_check.Models;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -12,10 +13,12 @@ namespace Api_health_check.Clients
     public class RecoveryClient : IRecoveryClient
     {
         private readonly HttpClient _http;
+        private readonly HealthCheckContext _context;
 
-        public RecoveryClient(HttpClient http)
+        public RecoveryClient(HttpClient http, HealthCheckContext context)
         {
             _http = http;
+            _context = context;
         }
 
         public static string ShortId (int Length)
@@ -49,7 +52,20 @@ namespace Api_health_check.Clients
                     webHookUrl= endpoint.RecoveryWebhookUrl 
                 };
 
-                var content = new StringContent(
+                var recoveryRequest = new RecoveryRequest
+                {
+                    RequestId = payload.requestId,
+                    EndpointId = endpoint.Id,
+                    action = payload.action.ToString(),
+                    target = payload.target,
+                    requestedAt = DateTime.UtcNow,
+
+                };
+                _context.RecoveryRequests.Add(recoveryRequest);
+                await  _context.SaveChangesAsync();
+
+
+            var content = new StringContent(
                     JsonSerializer.Serialize(payload),
                     Encoding.UTF8,
                     "application/json"

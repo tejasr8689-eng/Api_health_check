@@ -40,5 +40,7 @@ namespace Api_health_check.Data
 
         public DbSet<MonitoredEndpoint> MonitoredEndpoints => Set<MonitoredEndpoint>();
         public DbSet<RecoveryAuditLog> RecoveryAuditLos { get; set; }
+        public DbSet<RecoveryRequest> RecoveryRequests { get; set; }
+        public DbSet<RecoveryAck> RecoveryAcks { get; set; }
     }
 }

@@ -88,6 +88,50 @@ namespace Api_health_check.Migrations
                     b.ToTable("MonitoredEndpoints");
                 });
 
+            modelBuilder.Entity("Api_health_check.Models.RecoveryAck", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<int>("RecoveryRequestId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("action")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("completedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("details")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("receivedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("requestId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("target")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("RecoveryRequestId");
+
+                    b.ToTable("RecoveryAcks");
+                });
+
             modelBuilder.Entity("Api_health_check.Models.RecoveryAuditLog", b =>
                 {
                     b.Property<int>("Id")
@@ -120,6 +164,52 @@ namespace Api_health_check.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("RecoveryAuditLos");
+                });
+
+            modelBuilder.Entity("Api_health_check.Models.RecoveryRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("EndpointId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RequestId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("action")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("requestedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("target")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RecoveryRequests");
+                });
+
+            modelBuilder.Entity("Api_health_check.Models.RecoveryAck", b =>
+                {
+                    b.HasOne("Api_health_check.Models.RecoveryRequest", "RecoveryRequest")
+                        .WithMany()
+                        .HasForeignKey("RecoveryRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RecoveryRequest");
                 });
 #pragma warning restore 612, 618
         }
