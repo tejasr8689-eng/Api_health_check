@@ -1,0 +1,108 @@
+﻿@page
+@model Api_health_check.Pages.Endpoints.DetailsModel
+@{
+    ViewData["Title"] = "Endpoint Details";
+}
+<div style="display:flex; justify-content:space-between; align-items: center">
+    <div style ="display:flex; justify-content:flex-start">
+        <h2 class="mb-4">Endpoint Details</h2>
+   </div>
+    <div style="display:flex; align-items: center"> 
+    <span class="badge @(Model.Endpoint.IsActive ? "bg-success" : "bg-danger") fw-bold alighn-center">
+        @(Model.Endpoint.IsActive ? "Active" : "Inactive")
+    </span>
+       
+    </div>
+</div>
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <strong>@Model.Endpoint.Name.ToUpper()</strong>
+        @* <span class="badge badge-light float-right">
+            @Model.Endpoint.IsActive
+        </span> *@
+    </div>  
+   
+    <div class="card-body">
+        <!-- Basic Info -->
+        <h5 class="mb-3">Basic Info</h5>
+        <div class="row mb-2">
+            <div class="col-sm-4 font-weight-bold">URL:</div>
+            <div class="col-sm-8"><a href="@Model.Endpoint.Url" target="_blank">@Model.Endpoint.Url</a></div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-sm-4 font-weight-bold">Check Interval:</div>
+            <div class="col-sm-8">@Model.Endpoint.CheckIntervalSeconds seconds</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-sm-4 font-weight-bold">App Pool:</div>
+            <div class="col-sm-8">@Model.Endpoint.AppPoolName</div>
+        </div>
+
+        <!-- Recovery Info -->
+        <h5 class="mt-4 mb-3">Recovery Settings</h5>
+        <div class="row mb-2">
+            <div class="col-sm-4 font-weight-bold">Recovery Action:</div>
+            @{
+                var recoveryActions = new Dictionary<int, string>
+                        {
+                        {0, "Restart App Pool"},
+                        {1, "Start Website"},
+                        {2, "Restart Website"},
+                        {3, "Full Recovery"}
+                        };
+            }
+
+            <div class="col-sm-8">
+                @recoveryActions[Model.Endpoint.RecoveryAction]
+            </div>
+
+        </div>
+        <div class="row mb-2">
+            <div class="col-sm-4 font-weight-bold">Webhook URL:</div>
+            <div class="col-sm-8">
+                @if (!string.IsNullOrEmpty(Model.Endpoint.RecoveryWebhookUrl))
+                {
+                    <a href="@Model.Endpoint.RecoveryWebhookUrl" target="_blank">@Model.Endpoint.RecoveryWebhookUrl</a>
+                }
+                else
+                {
+                    <span class="text-muted">Not set</span>
+                }
+            </div>
+        </div>
+
+        <!-- Status Info -->
+        <h5 class="mt-4 mb-3">Status</h5>
+        <div class="row mb-2">
+            <div class="col-sm-4 font-weight-bold">Is Down?</div>
+            <div class="col-sm-8">
+                @if (Model.Endpoint.IsDown)
+                {
+                    <span class="text-danger">&#9888; Yes</span>
+                }
+                else
+                {
+                    <span class="text-success">&#10004; No</span>
+                }
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-sm-4 font-weight-bold">Consecutive Failures:</div>
+            <div class="col-sm-8 @(Model.Endpoint.consecutiveFailures > 3 ? "text-danger font-weight-bold" : "")">
+                @Model.Endpoint.consecutiveFailures
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-sm-4 font-weight-bold">Last Checked:</div>
+            <div class="col-sm-8">@Model.Endpoint.LastCheckUtc?.ToString("g") </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-sm-4 font-weight-bold">Last Recovery:</div>
+            <div class="col-sm-8">@Model.Endpoint.LastRecoveryUtc?.ToString("g") </div>
+        </div>
+    </div>
+
+    <div class="card-footer">
+        <a asp-page="/Endpoints/Index" class="btn btn-secondary">Back to List</a>
+    </div>
+</div>
