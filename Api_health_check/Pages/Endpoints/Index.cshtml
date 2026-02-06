@@ -13,6 +13,7 @@
 <table class="table table-hover align-middle ">
     <thead>
         <tr>
+            <th class="text-center">Details</th>
             <th class="text-center">Name</th>
             <th class="text-center">Url</th>
             <th class="text-center">Last Status</th>
@@ -29,6 +30,13 @@
         {
             var rowClass = e.IsDown ? "table-danger" : "table-success";
             <tr class="@rowClass">
+                <td>
+                    <div class="d-flex justify-content-center gap-2">
+                        <a asp-page="/Endpoints/Details" asp-route-id="@e.Id" class="btn btn-primary btn-sm">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </a>
+                     </div>
+                </td>
                 <td>@e.Name</td>
                 <td>@e.Url</td>
                 <td>@(e.LastStatusCode?.ToString() ?? "-")</td>
@@ -51,3 +59,9 @@
         }
     </tbody>
 </table>
+<script>
+    setInterval (() => 
+    {
+        location.reload();
+    },5000);
+</script>

@@ -1,4 +1,5 @@
 ﻿using Api_health_check.Data;
+using Api_health_check.DTOs.Endpoints;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Api_health_check.Pages.Endpoints
 {
-    public class CreateModel : PageModel
+    public class  CreateModel : PageModel
     {
         private readonly HealthCheckContext _context;
 
@@ -16,18 +17,14 @@ namespace Api_health_check.Pages.Endpoints
         }
 
         [BindProperty]
-        public MonitoredEndpoint Endpoint { get; set; } = default!; // do not new() here
+        public CreateEndPointsDto Endpoint { get; set; } = default!; // do not new() here
         public SelectList RecoveryAction { get; private set; }
 
         public void OnGet()
         {
             // provide defaults so the Razor form and generated code see non-null values
-            Endpoint = new MonitoredEndpoint
-            {
-                AppPoolName = string.Empty,
-                RecoveryWebhookUrl = string.Empty,
-                RecoveryAction = 0
-            };
+            Endpoint = new CreateEndPointsDto();
+           
             RecoveryAction = new SelectList(new[]
                 {
                 new { Value = 0, Text = "Restart App Pool" },
@@ -41,10 +38,29 @@ namespace Api_health_check.Pages.Endpoints
         {
             if (!ModelState.IsValid)
             {
+                OnGet();
                 return Page();
             }
 
-            _context.MonitoredEndpoints.Add(Endpoint);
+            var entity = new MonitoredEndpoint
+            {
+                Name = Endpoint.Name,
+                Url = Endpoint.Url,
+                CheckIntervalSeconds = Endpoint.CheckIntervalSeconds,
+                NotifyEmail = Endpoint.NotifyEmail,
+                AppPoolName = Endpoint.AppPoolName,
+                RecoveryWebhookUrl = Endpoint.RecoveryWebhookUrl,
+                IsActive = Endpoint.IsActive,
+                RecoveryAction = Endpoint.RecoveryAction,
+
+                // SYstem managedfields
+                 IsDown = false,
+                 ConsecutiveFailures = 0,
+                 LastCheckUtc = null,
+                 LastRecoveryUtc = null
+            };
+
+            _context.MonitoredEndpoints.Add(entity);
             await _context.SaveChangesAsync();
 
             // Later you can redirect to a dashboard; for now go home
