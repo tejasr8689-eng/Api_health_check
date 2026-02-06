@@ -25,6 +25,7 @@ builder.Services.AddScoped<AuditLogService>();
 builder.Services.AddSingleton<RetryPolicyService>();
 builder.Services.AddSingleton<WebhookRecoveryService>();
 builder.Services.AddScoped<RecoveryOrchestratorService>();
+builder.Services.AddScoped<DashboardServices>();
 builder.Services.AddHttpClient<IRecoveryClient, RecoveryClient>();
 builder.Services.AddLogging(logging =>
 {
